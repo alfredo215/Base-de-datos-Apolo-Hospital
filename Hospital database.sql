@@ -59,9 +59,7 @@ Cedula int primary key not null,
 Nombre_Doc varchar(50),
 Apellido varchar(50),
 Epecialidad varchar(50),
-Telefono int,
-Expedientes int,
-foreign key (Expedientes) references Pacientes(Codigo) 
+Telefono int
 );
 
   create table Vacunas_Usuario(
@@ -76,12 +74,10 @@ foreign key (IdUsuario) references Pacientes(Codigo)
 Cedula int primary key not null,
 Nombre_Enfer varchar(50),
 Apellido varchar(50),
-Epecialidad varchar(50),
-Expedientes int,
-foreign key (Expedientes) references Pacientes(Codigo)
+Epecialidad varchar(50)
  );
 
-create table Usuario(
+create table UsuariosHospital(
 N_Usuario int primary key not null auto_increment,
 Cedula int,
 Tipo varchar(10),
@@ -174,25 +170,17 @@ select CodigoMp, Medicamentos.Nombre Nombre, Medicamentos.Nombre Tipo from Medic
 inner join Medicamentos
 on MedicamentosPrescritos.CodigoMp = Medicamentos.CodigoM;
 
-select Cedula, Nombre_Doc, Doctores.Apellido, Epecialidad, Telefono, Pacientes.CodigoExpediente Expedientes from Doctores
-inner join Pacientes
-on Doctores.Expedientes = Pacientes.Codigo;
-
 select IdUsuarioVacuna,Pacientes.Nombre_P IdUsuario,Vacunas.Nombre_Vac IdVacuna from Vacunas_Usuario
 inner join Vacunas
 on Vacunas_Usuario.IdVacuna = Vacunas.Codigo
 inner join Pacientes
 on Vacunas_Usuario.IdUsuario=Pacientes.Codigo;
 
-select Cedula, Nombre_Enfer, Enfermeras.Apellido, Epecialidad, Pacientes.CodigoExpediente Expedientes from Enfermeras
-inner join Pacientes
-on Enfermeras.Expedientes = Pacientes.Codigo;
-
-select N_Usuario,Doctores.Cedula CedulaDoctor, Enfermeras.Cedula CedulaEnfremera, Tipo, Contrasena from Usuario
+select N_Usuario,Doctores.Cedula CedulaDoctor, Enfermeras.Cedula CedulaEnfremera, Tipo, Contrasena from UsuariosHospital
 inner join Doctores
-on Usuario.Cedula=Doctores.Cedula
+on UsuariosHospital.Cedula=Doctores.Cedula
 inner join Enfermeras
-on Usuario.Cedula=Enfermeras.Cedula;
+on UsuariosHospital.Cedula=Enfermeras.Cedula;
 
 select IdMujer,Pacientes.Nombre_P Nombre,Pacientes.Apellido Apellido , Embarazada from Mujeres
 inner join Pacientes
