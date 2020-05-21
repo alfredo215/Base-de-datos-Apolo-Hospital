@@ -15,7 +15,7 @@ use Apolo;
  CodigoM int primary key not null,
  Nombre varchar(75),
  Tipo varchar(75),
- Cantidad int
+ Cantidad double
  );
  
  #recuerda reparar al no saber si abra de ese medic en el hospital
@@ -45,10 +45,11 @@ Municipo_Nacimiento varchar(50),
 Peso smallint,
 Altura smallint,
 Vacunas int,
-EnfermedadesP int,##
+EnfermedadesP int,
 Alerguias varchar(200),
-Medicamento int,##
+Medicamento int,
 Antecedentes_Medicos int,
+Antecedentes_Odontologicos int,
 Cita int,
 foreign key (EnfermedadesP) references  Enfermedades(Enfermedad),
 foreign key (Medicamento) references  MedicamentosPrescritos(CodigoMp)
@@ -79,11 +80,12 @@ Epecialidad varchar(50)
 
 create table UsuariosHospital(
 N_Usuario int primary key not null auto_increment,
-Cedula int,
-Tipo varchar(10),
+CedulaD int,
+CedulaE int,
+Usuario varchar(50),
 Contrasena varchar(50),
-foreign key (Cedula) references Enfermeras(Cedula),
-foreign key (Cedula) references Doctores(Cedula)
+foreign key (CedulaE) references Enfermeras(Cedula),
+foreign key (CedulaD) references Doctores(Cedula)
 );
  
   create table Mujeres(
@@ -120,45 +122,46 @@ foreign key (CodigoPas) references Pacientes(Codigo)
  );
  
   create table Consulta_Odontologica(
- Codigo_Consulta int primary key not null,
+ Codigo_ConsultaO int primary key not null,
  Odontologo int,
  Paciente int,
  Sintomas varchar(50),
- Enfermedad int,
+ Enfermedad_Odontologica int,
  foreign key (Odontologo) references Doctores(Cedula),
  foreign key (Paciente) references Pacientes(Codigo),
- foreign key (Enfermedad) references Enfermedades(Enfermedad)
+ foreign key (Enfermedad_Odontologica) references Enfermedades(Enfermedad)
  );
  
  #reparar en conjuto con medicamento
  create table Receta_Medica(
  Codigo_Res int primary key not null,
  Enfermedad int,
+ Enfermedad_Odontologica int,
  Medicamento int,
  Cantidad int,
  Docis varchar(200),
  foreign key (Medicamento) references  Medicamentos(CodigoM),
-foreign key (Enfermedad) references Consulta_Odontologica(Codigo_Consulta),
-foreign key (Enfermedad) references Consulta(Codigo_Consulta)
+ foreign key (Enfermedad_Odontologica) references Consulta_Odontologica(Codigo_ConsultaO),
+ foreign key (Enfermedad) references Consulta(Codigo_Consulta)
  );
  
 ALTER TABLE Pacientes
 ADD FOREIGN KEY (Antecedentes_Medicos) REFERENCES Consulta(Codigo_Consulta);
 ALTER TABLE Pacientes
-ADD foreign key (Antecedentes_Medicos) references  Consulta_Odontologica(Codigo_Consulta);
+ADD foreign key (Antecedentes_Odontologicos) references  Consulta_Odontologica(Codigo_ConsultaO);
 ALTER TABLE Pacientes
 ADD foreign key (Cita) references  Reserva_Cita(Codigo_Cita);
 ALTER TABLE Pacientes
 ADD foreign key (Vacunas) references Vacunas_Usuario(IdUsuarioVacuna);
 
 
-select Codigo, CodigoExpediente, Nombre_P, Apellido,Sexo, Fecha_De_Nacimiento, Edad, Departamento_Nacimiento, Municipo_Nacimiento, Peso, Altura, Vacunas_Usuario.IdVacuna Vacunas, Enfermedades.Nombre_E Enfermedad, Alerguias, MedicamentosPrescritos.Nombre MedicamentoPrescrito, Consulta_Odontologica.Codigo_Consulta Antecedentes_Odontologicos, Consulta.Codigo_Consulta Antecedentes_Medicos, Reserva_Cita.Codigo_Cita Cita from Pacientes
+select Codigo, CodigoExpediente, Nombre_P, Apellido,Sexo, Fecha_De_Nacimiento, Edad, Departamento_Nacimiento, Municipo_Nacimiento, Peso, Altura, Vacunas_Usuario.IdVacuna Vacunas, Enfermedades.Nombre_E Enfermedad, Alerguias, MedicamentosPrescritos.Nombre MedicamentoPrescrito, Consulta_Odontologica.Codigo_ConsultaO Antecedentes_Odontologicos, Consulta.Codigo_Consulta Antecedentes_Medicos, Reserva_Cita.Codigo_Cita Cita from Pacientes
 inner join Vacunas_Usuario
 on Pacientes.Vacunas = Vacunas_Usuario.IdUsuarioVacuna
 inner join Reserva_Cita
 on Pacientes.Cita = Reserva_Cita.Codigo_Cita
 inner join Consulta_Odontologica
-on Pacientes.Antecedentes_Medicos = Consulta_Odontologica.Codigo_Consulta
+on Pacientes.Antecedentes_Odontologicos = Consulta_Odontologica.Codigo_ConsultaO
 inner join Consulta
 on Pacientes.Antecedentes_Medicos = Consulta.Codigo_Consulta
 inner join MedicamentosPrescritos
@@ -176,11 +179,11 @@ on Vacunas_Usuario.IdVacuna = Vacunas.Codigo
 inner join Pacientes
 on Vacunas_Usuario.IdUsuario=Pacientes.Codigo;
 
-select N_Usuario,Doctores.Cedula CedulaDoctor, Enfermeras.Cedula CedulaEnfremera, Tipo, Contrasena from UsuariosHospital
+select N_Usuario,Doctores.Cedula CedulaDoctor, Enfermeras.Cedula CedulaEnfremera, Usuario, Contrasena from UsuariosHospital
 inner join Doctores
-on UsuariosHospital.Cedula=Doctores.Cedula
+on UsuariosHospital.CedulaD=Doctores.Cedula
 inner join Enfermeras
-on UsuariosHospital.Cedula=Enfermeras.Cedula;
+on UsuariosHospital.CedulaE=Enfermeras.Cedula;
 
 select IdMujer,Pacientes.Nombre_P Nombre,Pacientes.Apellido Apellido , Embarazada from Mujeres
 inner join Pacientes
@@ -198,17 +201,17 @@ on Consulta.Paciente=Pacientes.Codigo
 inner join Enfermedades
 on Consulta.Enfermedad = Enfermedades.Enfermedad;
 
-select Codigo_Consulta, Doctores.Nombre_Doc NombreOdontologo, Doctores.Apellido ApellidoOdontologo,Pacientes.Nombre_P NombrePasiente,Pacientes.Apellido ApellidoPasiente, Sintomas, Enfermedades.Enfermedad from Consulta_Odontologica
+select Codigo_ConsultaO, Doctores.Nombre_Doc NombreOdontologo, Doctores.Apellido ApellidoOdontologo,Pacientes.Nombre_P NombrePasiente,Pacientes.Apellido ApellidoPasiente, Sintomas, Enfermedades.Enfermedad from Consulta_Odontologica
 inner join Doctores
 on Consulta_Odontologica.Odontologo=Doctores.Cedula
 inner join Pacientes
 on Consulta_Odontologica.Paciente=Pacientes.Codigo
 inner join Enfermedades
-on Consulta_Odontologica.Enfermedad = Enfermedades.Enfermedad;
+on Consulta_Odontologica.Enfermedad_Odontologica = Enfermedades.Enfermedad;
 
-select Codigo_Res, Consulta_Odontologica.Enfermedad EnfermedadOdontologica, Consulta.Enfermedad Enfermedad , Medicamentos.Nombre Medicamento, Receta_Medica.Cantidad, Docis from Receta_Medica
+select Codigo_Res, Consulta_Odontologica.Enfermedad_Odontologica EnfermedadOdontologica, Consulta.Enfermedad Enfermedad , Medicamentos.Nombre Medicamento, Receta_Medica.Cantidad, Docis from Receta_Medica
 inner join Consulta_Odontologica
-on Receta_Medica.Enfermedad=Consulta_Odontologica.Codigo_Consulta
+on Receta_Medica.Enfermedad_Odontologica=Consulta_Odontologica.Codigo_ConsultaO
 inner join Consulta
 on Receta_Medica.Enfermedad=Consulta.Codigo_Consulta
 inner join Medicamentos
