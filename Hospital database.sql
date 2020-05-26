@@ -79,7 +79,7 @@ Epecialidad varchar(50)
  );
 
 create table UsuariosHospital(
-N_Usuario int primary key not null auto_increment,
+N_Usuario int primary key not null,
 CedulaD int,
 CedulaE int,
 Usuario varchar(50),
