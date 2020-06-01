@@ -17,15 +17,7 @@ use Apolo;
  Tipo varchar(75),
  Cantidad double
  );
- 
- #recuerda reparar al no saber si abra de ese medic en el hospital
-  create table MedicamentosPrescritos(
-CodigoMp int primary key not null,
-Nombre int,
-Tipo int,
-foreign key (Nombre) references Medicamentos(CodigoM)
- );
- 
+
   create table Enfermedades(
  Enfermedad int primary key not null,
  Nombre_E varchar(75),
@@ -47,12 +39,12 @@ Altura smallint,
 Vacunas int,
 EnfermedadesP int,
 Alerguias varchar(200),
-Medicamento int,
+MedicamentoPrescrito int,
 Antecedentes_Medicos int,
 Antecedentes_Odontologicos int,
 Cita int,
-foreign key (EnfermedadesP) references  Enfermedades(Enfermedad),
-foreign key (Medicamento) references  MedicamentosPrescritos(CodigoMp)
+foreign key (MedicamentoPrescrito) references Medicamentos(CodigoM),
+foreign key (EnfermedadesP) references  Enfermedades(Enfermedad)
  );
  
 create table Doctores(
@@ -155,7 +147,7 @@ ALTER TABLE Pacientes
 ADD foreign key (Vacunas) references Vacunas_Usuario(IdUsuarioVacuna);
 
 
-select Codigo, CodigoExpediente, Nombre_P, Apellido,Sexo, Fecha_De_Nacimiento, Edad, Departamento_Nacimiento, Municipo_Nacimiento, Peso, Altura, Vacunas_Usuario.IdVacuna Vacunas, Enfermedades.Nombre_E Enfermedad, Alerguias, MedicamentosPrescritos.Nombre MedicamentoPrescrito, Consulta_Odontologica.Codigo_ConsultaO Antecedentes_Odontologicos, Consulta.Codigo_Consulta Antecedentes_Medicos, Reserva_Cita.Codigo_Cita Cita from Pacientes
+select Codigo, CodigoExpediente, Nombre_P, Apellido,Sexo, Fecha_De_Nacimiento, Edad, Departamento_Nacimiento, Municipo_Nacimiento, Peso, Altura, Vacunas_Usuario.IdVacuna Vacunas, Enfermedades.Nombre_E Enfermedad, Alerguias, Medicamentos.Nombre MedicamentoPrescrito, Consulta_Odontologica.Codigo_ConsultaO Antecedentes_Odontologicos, Consulta.Codigo_Consulta Antecedentes_Medicos, Reserva_Cita.Codigo_Cita Cita from Pacientes
 inner join Vacunas_Usuario
 on Pacientes.Vacunas = Vacunas_Usuario.IdUsuarioVacuna
 inner join Reserva_Cita
@@ -164,14 +156,10 @@ inner join Consulta_Odontologica
 on Pacientes.Antecedentes_Odontologicos = Consulta_Odontologica.Codigo_ConsultaO
 inner join Consulta
 on Pacientes.Antecedentes_Medicos = Consulta.Codigo_Consulta
-inner join MedicamentosPrescritos
-on Pacientes.Medicamento = MedicamentosPrescritos.CodigoMp
+inner join Medicamentos
+on Pacientes.MedicamentoPrescrito = Medicamentos.CodigoM
 inner join Enfermedades
 on Pacientes.EnfermedadesP = Enfermedades.Enfermedad;
-
-select CodigoMp, Medicamentos.Nombre Nombre, Medicamentos.Nombre Tipo from MedicamentosPrescritos
-inner join Medicamentos
-on MedicamentosPrescritos.CodigoMp = Medicamentos.CodigoM;
 
 select IdUsuarioVacuna,Pacientes.Nombre_P IdUsuario,Vacunas.Nombre_Vac IdVacuna from Vacunas_Usuario
 inner join Vacunas
