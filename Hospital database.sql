@@ -3,29 +3,28 @@ create database Apolo;
 use Apolo;
 
 
-
  create table Vacunas(
- Codigo int primary key not null,
+ Codigo int primary key,
  Nombre_Vac varchar (50),
  Tipo Varchar(50),
  Estado varchar(5)
  );
  
   create table Medicamentos(
- CodigoM int primary key not null,
+ CodigoM int primary key,
  Nombre varchar(75),
  Tipo varchar(75),
  Cantidad double
  );
 
   create table Enfermedades(
- Enfermedad int primary key not null,
+ Enfermedad int primary key,
  Nombre_E varchar(75),
  Tipo varchar (50)
  );
  
 create table Pacientes(
-Codigo int primary key not null,
+Codigo int primary key,
 CodigoExpediente int,
 Nombre_P varchar(50),
 Apellido varchar(50),
@@ -56,7 +55,7 @@ Telefono int
 );
 
   create table Vacunas_Usuario(
-IdUsuarioVacuna int  primary key not null,
+IdUsuarioVacuna int  primary key,
 IdUsuario int,
 IdVacuna int,
 foreign key (IdVacuna) references Vacunas(Codigo),
@@ -95,15 +94,15 @@ foreign key (CedulaD) references Doctores(Cedula)
  );
 
  create table Reserva_Cita(
-Codigo_Cita int primary key not null,
-CodigoPas int not null,
+Codigo_Cita int primary key,
+CodigoPas int,
 Fecha_Cita date,
 Hora_Cita varchar(50)/*reparar al considerar el tipo de dato para horas*/,
 foreign key (CodigoPas) references Pacientes(Codigo)
  );
  
  create table Consulta(
- Codigo_Consulta int primary key not null,
+ Codigo_Consulta int primary key,
  Doctor int,
  Paciente int,
   Sintomas varchar(50),
@@ -114,7 +113,7 @@ foreign key (CodigoPas) references Pacientes(Codigo)
  );
  
   create table Consulta_Odontologica(
- Codigo_ConsultaO int primary key not null,
+ Codigo_ConsultaO int primary key,
  Odontologo int,
  Paciente int,
  Sintomas varchar(50),
@@ -126,15 +125,23 @@ foreign key (CodigoPas) references Pacientes(Codigo)
  
  #reparar en conjuto con medicamento
  create table Receta_Medica(
- Codigo_Res int primary key not null,
+ Codigo_Res int primary key,
  Enfermedad int,
  Enfermedad_Odontologica int,
  Medicamento int,
- Cantidad int,
+ Cantidad double,
  Docis varchar(200),
  foreign key (Medicamento) references  Medicamentos(CodigoM),
  foreign key (Enfermedad_Odontologica) references Consulta_Odontologica(Codigo_ConsultaO),
  foreign key (Enfermedad) references Consulta(Codigo_Consulta)
+ );
+ 
+  create table Lote_Medico(
+ Codigo_Lote int primary key,
+ NvMedicamento int,
+ Cantidad double,
+ Fecha_Entrega date,
+ foreign key (NvMedicamento) references  Medicamentos(CodigoM)
  );
  
 ALTER TABLE Pacientes
@@ -203,4 +210,16 @@ on Receta_Medica.Enfermedad_Odontologica=Consulta_Odontologica.Codigo_ConsultaO
 inner join Consulta
 on Receta_Medica.Enfermedad=Consulta.Codigo_Consulta
 inner join Medicamentos
-on Receta_Medica.Medicamento=Medicamentos.CodigoM
+on Receta_Medica.Medicamento=Medicamentos.CodigoM;
+
+CREATE DEFINER = CURRENT_USER TRIGGER apolo.restarStock 
+AFTER INSERT ON Receta_Medica FOR EACH ROW
+Update Medicamentos
+set Medicamentos.Cantidad = Medicamentos.Cantidad - NEW .Cantidad
+where Medicamentos.CodigoM = NEW .Medicamento;
+
+CREATE DEFINER = CURRENT_USER TRIGGER apolo.sumarStock 
+AFTER INSERT ON Lote_Medico FOR EACH ROW
+Update Medicamentos
+set Medicamentos.Cantidad = Medicamentos.Cantidad + NEW .Cantidad
+where Medicamentos.CodigoM = NEW .NvMedicamento
