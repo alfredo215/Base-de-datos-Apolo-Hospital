@@ -25,7 +25,6 @@ use Apolo;
  
 create table Pacientes(
 Codigo int primary key,
-CodigoExpediente int,
 Nombre_P varchar(50),
 Apellido varchar(50),
 Sexo varchar(2),
