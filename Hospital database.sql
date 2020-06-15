@@ -153,7 +153,7 @@ ALTER TABLE Pacientes
 ADD foreign key (Vacunas) references Vacunas_Usuario(IdUsuarioVacuna);
 
 
-select Codigo, CodigoExpediente, Nombre_P, Apellido,Sexo, Fecha_De_Nacimiento, Edad, Departamento_Nacimiento, Municipo_Nacimiento, Peso, Altura, Vacunas_Usuario.IdVacuna Vacunas, Enfermedades.Nombre_E Enfermedad, Alerguias, Medicamentos.Nombre MedicamentoPrescrito, Consulta_Odontologica.Codigo_ConsultaO Antecedentes_Odontologicos, Consulta.Codigo_Consulta Antecedentes_Medicos, Reserva_Cita.Codigo_Cita Cita from Pacientes
+select Codigo, Nombre_P, Apellido,Sexo, Fecha_De_Nacimiento, Edad, Departamento_Nacimiento, Municipo_Nacimiento, Peso, Altura, Vacunas_Usuario.IdVacuna Vacunas, Enfermedades.Nombre_E Enfermedad, Alerguias, Medicamentos.Nombre MedicamentoPrescrito, Consulta_Odontologica.Codigo_ConsultaO Antecedentes_Odontologicos, Consulta.Codigo_Consulta Antecedentes_Medicos, Reserva_Cita.Codigo_Cita Cita from Pacientes
 inner join Vacunas_Usuario
 on Pacientes.Vacunas = Vacunas_Usuario.IdUsuarioVacuna
 inner join Reserva_Cita
@@ -167,7 +167,7 @@ on Pacientes.MedicamentoPrescrito = Medicamentos.CodigoM
 inner join Enfermedades
 on Pacientes.EnfermedadesP = Enfermedades.Enfermedad;
 
-select IdUsuarioVacuna,Pacientes.Nombre_P IdUsuario,Vacunas.Nombre_Vac IdVacuna from Vacunas_Usuario
+select IdUsuarioVacuna, Pacientes.Nombre_P IdUsuario,Vacunas.Nombre_Vac IdVacuna from Vacunas_Usuario
 inner join Vacunas
 on Vacunas_Usuario.IdVacuna = Vacunas.Codigo
 inner join Pacientes
