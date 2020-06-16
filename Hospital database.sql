@@ -96,7 +96,7 @@ foreign key (CedulaD) references Doctores(Cedula)
 Codigo_Cita int primary key,
 CodigoPas int,
 Fecha_Cita date,
-Hora_Cita varchar(50)/*reparar al considerar el tipo de dato para horas*/,
+Hora_Cita varchar(50),
 foreign key (CodigoPas) references Pacientes(Codigo)
  );
  
